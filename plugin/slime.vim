@@ -82,6 +82,39 @@ function! s:TmuxConfig() abort
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" DVTM
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! s:DvtmCommand(config, args)
+  let l:socket = a:config["socket_name"]
+  "let l:socket = system("echo $DVTM_CMD_FIFO")
+  "return system("echo ". a:args . " > " . l:socket)
+  echo system(a:args . " > " . shellescape(l:socket))
+endfunction
+
+function! s:DvtmSend(config, text)
+  let l:socket = a:config["socket_name"]
+  let l:pane = a:config["target_pane"]
+  call s:WritePasteFileDvtm(a:text)
+  call s:DvtmCommand(a:config, "echo focusn " . l:pane )
+  call s:DvtmCommand(a:config, "cat " . shellescape(g:slime_paste_file))
+  call s:DvtmCommand(a:config, "echo focuslast " . l:pane )
+  "call s:TmuxCommand(a:config, "paste-buffer -d -t " . shellescape(a:config["target_pane"]))
+endfunction
+
+function! s:DvtmConfig() abort
+  if !exists("b:slime_config")
+    let b:slime_config = {"socket_name": $DVTM_CMD_FIFO, "target_pane": "2"}
+  end
+  let b:slime_config["socket_name"] = input("dvtm socket name or absolute path: ", b:slime_config["socket_name"])
+  let b:slime_config["target_pane"] = input("dvtm target pane: ", b:slime_config["target_pane"])
+  "if b:slime_config["target_pane"] =~ '\s\+'
+    "let b:slime_config["target_pane"] = split(b:slime_config["target_pane"])[0]
+  "endif
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neovim Terminal
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -214,6 +247,12 @@ endfun
 function! s:WritePasteFile(text)
   " could check exists("*writefile")
   call system("cat > " . g:slime_paste_file, a:text)
+endfunction
+
+function! s:WritePasteFileDvtm(text)
+  " could check exists("*writefile")
+  call system("echo -n 'pasteext ' > " . g:slime_paste_file)
+  call system("cat >> " . g:slime_paste_file, a:text)
 endfunction
 
 function! s:_EscapeText(text)
