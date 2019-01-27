@@ -97,8 +97,9 @@ function! s:DvtmSend(config, text)
   let l:pane = a:config["target_pane"]
   call s:WritePasteFileDvtm(a:text)
   call s:DvtmCommand(a:config, "echo focusn " . l:pane )
-  call s:DvtmCommand(a:config, "cat " . shellescape(g:slime_paste_file))
-  call s:DvtmCommand(a:config, "echo focuslast " . l:pane )
+  call system("~/scripts/dvtmPaste " . shellescape(g:slime_paste_file))
+  "call s:DvtmCommand(a:config, "echo pasteext %run -i " . shellescape(g:slime_paste_file) . "\r")
+  call s:DvtmCommand(a:config, "sleep 0.1; echo focuslast " . l:pane )
   "call s:TmuxCommand(a:config, "paste-buffer -d -t " . shellescape(a:config["target_pane"]))
 endfunction
 
@@ -251,8 +252,8 @@ endfunction
 
 function! s:WritePasteFileDvtm(text)
   " could check exists("*writefile")
-  call system("echo -n 'pasteext ' > " . g:slime_paste_file)
-  call system("cat >> " . g:slime_paste_file, a:text)
+  "call system("echo -n 'pasteext ' > " . g:slime_paste_file)
+  call system("cat > " . g:slime_paste_file, a:text)
 endfunction
 
 function! s:_EscapeText(text)
