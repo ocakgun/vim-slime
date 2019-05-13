@@ -8,7 +8,7 @@ let g:loaded_slime = 1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if !exists("g:slime_target")
-  let g:slime_target = "screen"
+  let g:slime_target = "dvtm"
 end
 
 if !exists("g:slime_preserve_curpos")
