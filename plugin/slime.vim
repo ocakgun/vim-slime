@@ -20,6 +20,10 @@ if !exists("g:slime_paste_file")
   let g:slime_paste_file = expand("$HOME/.slime_paste")
 end
 
+if !exists("g:slime_script")
+  let g:slime_script = "~/scritps/dvtmPaste "
+end
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Screen
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -95,9 +99,11 @@ endfunction
 function! s:DvtmSend(config, text)
   let l:socket = a:config["socket_name"]
   let l:pane = a:config["target_pane"]
+  let l:script = g:slime_script
   call s:WritePasteFileDvtm(a:text)
   call s:DvtmCommand(a:config, "echo focusn " . l:pane )
   call system("~/scripts/dvtmPaste " . shellescape(g:slime_paste_file))
+  " call system(l:script . shellescape(g:slime_paste_file))
   "call s:DvtmCommand(a:config, "echo pasteext %run -i " . shellescape(g:slime_paste_file) . "\r")
   call s:DvtmCommand(a:config, "sleep 0.1; echo focuslast " . l:pane )
   "call s:TmuxCommand(a:config, "paste-buffer -d -t " . shellescape(a:config["target_pane"]))
